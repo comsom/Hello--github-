@@ -1,0 +1,46 @@
+#!/usr/bin/ruby
+
+# desc: 'ls -X' (拡張子の順に並べ替えて表示) ができなかったので自作。
+# usage: ruby lx <ARGSTR>      ... ARGSTR には -a とかの option も含める。
+
+ARGSTR = (ARGV.any? ? ARGV.join(' ') : '')
+
+A = `ls #{ARGSTR}`.split("\n")
+B = A.sort_by{|s|
+  s=~/([^\.]+)(\.(.+))?/
+  [ ($3!=nil ? $3:''), ($1!=nil ? $1:'') ]
+}
+
+# 最長のファイル名に応じて表示カラム数を変える。
+ML_FN   = B.map{|s| s.length }.max    # abbrev: Max Length of FileName
+WCOL    = ML_FN + 1                                # 1カラムの幅
+SH_WCOL = `env`.scan(/COLUMNS=(\d+)/)[0][0].to_i   # shell のカラム幅
+NCOL    = SH_WCOL / WCOL                           # カラム数
+
+C = B.map{|s| s.ljust(WCOL) }
+
+#---------------
+# file を並べる。
+# 1カラムに何個でも file を入れてよいが、
+# 見やすさのため1カラム当たりの file 数が最小となるように入れる。
+
+# ncol==3; A==(1..13).to_a ---> [[1,2,3,4,5],[6,7,8,9,10], [11,12,13]] == d
+
+# C.length 以上の ncol の倍数のうち、最小のものを ncol で割る。
+# その値を1カラム当たりの file 数とすれば良い。
+CL = C.length                                          # abbrev: C length
+CU = (CL...(CL+NCOL)).select{|n| n%NCOL==0 }[0]        # abbrev: C upper
+NFILE_IN1COL = CU / NCOL
+
+D = (0...CU).inject([]) {|acc, i|
+  r = i % NFILE_IN1COL
+  if r==0
+    acc << [C[i]]            # 次のカラムを埋め始める。
+  else
+    acc[-1] << C[i]; acc     # 既存のカラムに詰める。transpose のため nil も詰める。
+  end
+}
+E = D.transpose
+F = E.map{|row| row.join }.join("\n")              # nil は join 時に消える。
+
+puts(F)
