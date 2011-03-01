@@ -1,4 +1,15 @@
-desc: git の「次の手順」を見ながら README for 'Hello, World! in Git'
+desc: Synopses for files in this repo.
+oldesc: git の「次の手順」を見ながら README for 'Hello, World! in Git'
 
 date: 9;2011/3/1 (tue)
+
+初めてのリポジトリをとりあえず練習用に使う。
+I use my first repo for the practice of github.
+あまり肩肘張らずに push していこう。
+Let's push snapshots(?) without any seriousness.
+
+hello.rb  ... 'Hello, World!' program written in Ruby
+lx        ... My bash in MacOSX doesn't have '-X' option
+              (sort by extension) for 'ls' command,
+              so I wrote its replacement in Ruby.
 
